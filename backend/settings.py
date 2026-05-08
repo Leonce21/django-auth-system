@@ -84,7 +84,7 @@ if IS_VERCEL:
     # Vercel → Supabase Session Pooler (requires tenant identifier in username)
     DB_HOST = 'aws-1-eu-west-1.pooler.supabase.com'
     DB_PORT = '5432'
-    DB_USER = 'postgres.fvsylxftadodfucftqrc'  # <-- KEY: postgres.project_ref
+    DB_USER = 'postgres.fvsylxftadodfucftqrc'
     DB_NAME = 'postgres'
 else:
     # Local → Direct connection
