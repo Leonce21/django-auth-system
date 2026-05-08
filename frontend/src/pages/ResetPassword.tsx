@@ -4,12 +4,11 @@
  */
 
 import React, { useState } from 'react';
-import { useLocation, useNavigate, Link } from 'react-router-dom';
+import { useLocation, Link } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 
 const ResetPassword: React.FC = () => {
   const location = useLocation();
-  const navigate = useNavigate();
   const { resetPassword } = useAuth();
   
   const [formData, setFormData] = useState({
