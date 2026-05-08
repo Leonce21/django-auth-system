@@ -76,16 +76,18 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'backend.wsgi.application'
 
-# ==================== DATABASE CONFIGURATION (SUPABASE) ====================
-# Using Supabase PostgreSQL as primary database
+# Detect if running on Vercel
+IS_VERCEL = os.environ.get('VERCEL') == '1'
+
+# ==================== DATABASE CONFIGURATION ====================
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
         'NAME': 'postgres',
         'USER': 'postgres',
         'PASSWORD': os.getenv('SUPABASE_DB_PASSWORD', ''),
-        'HOST': os.getenv('SUPABASE_POOLER_HOST', 'db.fvsylxftadodfucftqrc.supabase.co'),
-        'PORT': os.getenv('SUPABASE_POOLER_PORT', '5432'),
+        'HOST': 'aws-1-eu-west-1.pooler.supabase.com' if IS_VERCEL else 'db.fvsylxftadodfucftqrc.supabase.co',
+        'PORT': '6543' if IS_VERCEL else '5432',  # 6543 = transaction pooler (serverless), 5432 = direct
         'OPTIONS': {
             'sslmode': 'require',
             'connect_timeout': 10,
