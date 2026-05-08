@@ -83,11 +83,12 @@ DATABASES = {
         'ENGINE': 'django.db.backends.postgresql',
         'NAME': 'postgres',
         'USER': 'postgres',
-        'PASSWORD': os.getenv('SUPABASE_DB_PASSWORD', ''),  # From Supabase dashboard
-        'HOST': 'db.fvsylxftadodfucftqrc.supabase.co',  # db.xxx.supabase.co
-        'PORT': '5432',
+        'PASSWORD': os.getenv('SUPABASE_DB_PASSWORD', ''),
+        'HOST': os.getenv('SUPABASE_POOLER_HOST', 'db.fvsylxftadodfucftqrc.supabase.co'),
+        'PORT': os.getenv('SUPABASE_POOLER_PORT', '5432'),
         'OPTIONS': {
-            'sslmode': 'require',  # Supabase requires SSL
+            'sslmode': 'require',
+            'connect_timeout': 10,
         },
     }
 }

@@ -36,6 +36,7 @@ class RegisterView(APIView):
     permission_classes = [permissions.AllowAny]
     
     @swagger_auto_schema(
+        security=[],
         request_body=UserRegistrationSerializer,
         operation_description="Register new user with email verification",
         responses={
@@ -172,6 +173,7 @@ class ResendOTPView(APIView):
     permission_classes = [permissions.AllowAny]
     
     @swagger_auto_schema(
+        security=[],
         request_body=ResendOTPSerializer,
         operation_description="Request new OTP code",
         responses={200: 'OTP resent', 429: 'Too many requests'}
@@ -224,6 +226,7 @@ class LoginView(APIView):
     permission_classes = [permissions.AllowAny]
     
     @swagger_auto_schema(
+        security=[],
         request_body=LoginSerializer,
         operation_description="Login with email and password",
         responses={
@@ -541,6 +544,7 @@ class TokenRefreshView(APIView):
     permission_classes = [permissions.AllowAny]
     
     @swagger_auto_schema(
+        security=[],
         request_body=openapi.Schema(
             type=openapi.TYPE_OBJECT,
             properties={
