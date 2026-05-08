@@ -212,6 +212,31 @@ except OSError:
     LOGS_DIR = Path('/tmp/logs')
     LOGS_DIR.mkdir(parents=True, exist_ok=True)
 
+# ==================== LOGS DIRECTORY ====================
+# Vercel serverless has a read-only filesystem except /tmp
+# We must detect this at runtime, not via env vars
+
+def get_logs_dir():
+    """Return a writable logs directory. Falls back to /tmp/logs on read-only fs."""
+    # Try BASE_DIR/logs first (local dev, traditional servers)
+    local_logs = BASE_DIR / 'logs'
+    try:
+        local_logs.mkdir(parents=True, exist_ok=True)
+        # Verify it's actually writable
+        test_file = local_logs / '.write_test'
+        test_file.write_text('ok')
+        test_file.unlink()
+        return local_logs
+    except (OSError, PermissionError):
+        pass
+    
+    # Fallback to /tmp/logs (Vercel, AWS Lambda, etc.)
+    tmp_logs = Path('/tmp/logs')
+    tmp_logs.mkdir(parents=True, exist_ok=True)
+    return tmp_logs
+
+LOGS_DIR = get_logs_dir()
+
 # ==================== LOGGING CONFIGURATION ====================
 LOGGING = {
     'version': 1,
@@ -233,7 +258,7 @@ LOGGING = {
         },
         'file': {
             'class': 'logging.FileHandler',
-            'filename': LOGS_DIR / 'django.log',  # Uses LOGS_DIR (either BASE_DIR/logs or /tmp/logs)
+            'filename': LOGS_DIR / 'django.log',
             'formatter': 'verbose',
         },
     },
@@ -247,14 +272,13 @@ LOGGING = {
             'level': 'INFO',
             'propagate': False,
         },
-        'authentication': {  # Custom logger for our auth app
+        'authentication': {
             'handlers': ['console', 'file'],
             'level': 'DEBUG',
             'propagate': False,
         },
     },
 }
-
 # ==================== CUSTOM USER MODEL ====================
 AUTH_USER_MODEL = 'authentication.User'
 
