@@ -162,22 +162,22 @@ const Dashboard: React.FC = () => {
           </div>
 
           {/* API Documentation Card */}
-          <div className="mt-6 bg-white overflow-hidden shadow rounded-lg">
-            <div className="px-4 py-5 sm:p-6">
-              <h2 className="text-lg font-medium text-gray-900 mb-2">API Documentation</h2>
-              <p className="text-sm text-gray-600 mb-4">
-                Explore the API endpoints using Swagger UI.
-              </p>
-              <a
-                href="http://localhost:8000/swagger/"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-blue-700 bg-blue-100 hover:bg-blue-200"
-              >
-                Open Swagger Docs
-              </a>
-            </div>
-          </div>
+<div className="mt-6 bg-white overflow-hidden shadow rounded-lg">
+  <div className="px-4 py-5 sm:p-6">
+    <h2 className="text-lg font-medium text-gray-900 mb-2">API Documentation</h2>
+    <p className="text-sm text-gray-600 mb-4">
+      Explore the API endpoints using Swagger UI.
+    </p>
+    <a
+      href={`${window.location.origin}/api/docs/`}
+      target="_blank"
+      rel="noopener noreferrer"
+      className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-blue-700 bg-blue-100 hover:bg-blue-200"
+    >
+      Open Swagger Docs
+    </a>
+  </div>
+</div>
         </div>
       </main>
     </div>

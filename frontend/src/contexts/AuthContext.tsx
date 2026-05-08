@@ -6,8 +6,10 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import axios from 'axios';
 
-// API base URL - Django backend
-const API_URL = 'http://localhost:8000/api/auth';
+// Dynamic API URL: uses env var or falls back to same-origin /api/auth for production
+const API_URL = process.env.REACT_APP_API_URL || '/api/auth';
+
+console.log('[AUTH_CONFIG] API_URL:', API_URL);
 
 // Create axios instance with interceptors
 const api = axios.create({
@@ -23,7 +25,6 @@ api.interceptors.request.use((config) => {
   if (token) {
     config.headers.Authorization = `Bearer ${token}`;
   }
-  // LOG: outgoing request
   console.log(`[AUTH_API] ${config.method?.toUpperCase()} ${config.url}`, config.data || '');
   return config;
 });
@@ -31,13 +32,11 @@ api.interceptors.request.use((config) => {
 // Handle token refresh on 401
 api.interceptors.response.use(
   (response) => {
-    // LOG: successful response
     console.log(`[AUTH_API] ✅ ${response.config.url} →`, response.status, response.data);
     return response;
   },
   async (error) => {
     const originalRequest = error.config;
-    // LOG: error response
     console.error(`[AUTH_API] ❌ ${originalRequest?.url} →`, error.response?.status, error.response?.data);
     
     if (error.response?.status === 401 && !originalRequest._retry) {
@@ -55,7 +54,6 @@ api.interceptors.response.use(
         originalRequest.headers.Authorization = `Bearer ${access}`;
         return api(originalRequest);
       } catch (refreshError) {
-        // Refresh failed, logout user
         localStorage.removeItem('access_token');
         localStorage.removeItem('refresh_token');
         window.location.href = '/login';
@@ -120,7 +118,6 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [user, setUser] = useState<User | null>(null);
   const [isLoading, setIsLoading] = useState(true);
 
-  // Check auth status on mount
   useEffect(() => {
     console.log('[AUTH_FLOW] AuthProvider mounted, checking token...');
     const token = localStorage.getItem('access_token');
@@ -161,7 +158,6 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   const register = async (data: RegisterData) => {
     console.log('[AUTH_FLOW] Starting registration for:', data.email);
-    // Use FormData for file upload
     const formData = new FormData();
     Object.entries(data).forEach(([key, value]) => {
       if (value !== undefined && value !== null) {
@@ -182,7 +178,6 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     const response = await api.post('/verify-email/', { email, otp_code });
     console.log('[AUTH_FLOW] Verify-email response:', response.data);
     
-    // Handle case where backend returns tokens (auto-login after verify)
     if (response.data.tokens) {
       const { tokens, user: userData } = response.data;
       localStorage.setItem('access_token', tokens.access);
