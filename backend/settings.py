@@ -198,6 +198,20 @@ EMAIL_HOST_PASSWORD = os.getenv('EMAIL_HOST_PASSWORD')  # App Password, not regu
 DEFAULT_FROM_EMAIL = f'DigiAuth <{os.getenv("EMAIL_HOST_USER")}>'
 SERVER_EMAIL = os.getenv('EMAIL_HOST_USER')
 
+# ==================== LOGS DIRECTORY (Must be defined BEFORE LOGGING) ====================
+# Vercel serverless has a read-only filesystem except /tmp
+if os.environ.get('VERCEL'):
+    LOGS_DIR = Path('/tmp/logs')
+else:
+    LOGS_DIR = BASE_DIR / 'logs'
+
+try:
+    LOGS_DIR.mkdir(parents=True, exist_ok=True)
+except OSError:
+    # Fallback for read-only filesystems
+    LOGS_DIR = Path('/tmp/logs')
+    LOGS_DIR.mkdir(parents=True, exist_ok=True)
+
 # ==================== LOGGING CONFIGURATION ====================
 LOGGING = {
     'version': 1,
@@ -219,7 +233,7 @@ LOGGING = {
         },
         'file': {
             'class': 'logging.FileHandler',
-            'filename': BASE_DIR / 'logs' / 'django.log',
+            'filename': LOGS_DIR / 'django.log',  # Uses LOGS_DIR (either BASE_DIR/logs or /tmp/logs)
             'formatter': 'verbose',
         },
     },
@@ -240,10 +254,6 @@ LOGGING = {
         },
     },
 }
-
-# Create logs directory if it doesn't exist
-LOGS_DIR = BASE_DIR / 'logs'
-LOGS_DIR.mkdir(exist_ok=True)
 
 # ==================== CUSTOM USER MODEL ====================
 AUTH_USER_MODEL = 'authentication.User'
