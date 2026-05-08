@@ -80,14 +80,27 @@ WSGI_APPLICATION = 'backend.wsgi.application'
 IS_VERCEL = os.environ.get('VERCEL') == '1'
 
 # ==================== DATABASE CONFIGURATION ====================
+if IS_VERCEL:
+    # Vercel → Supabase Session Pooler (requires tenant identifier in username)
+    DB_HOST = 'aws-1-eu-west-1.pooler.supabase.com'
+    DB_PORT = '5432'
+    DB_USER = 'postgres.fvsylxftadodfucftqrc'  # <-- KEY: postgres.project_ref
+    DB_NAME = 'postgres'
+else:
+    # Local → Direct connection
+    DB_HOST = 'db.fvsylxftadodfucftqrc.supabase.co'
+    DB_PORT = '5432'
+    DB_USER = 'postgres'
+    DB_NAME = 'postgres'
+
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'postgres',
-        'USER': 'postgres',
+        'NAME': DB_NAME,
+        'USER': DB_USER,
         'PASSWORD': os.getenv('SUPABASE_DB_PASSWORD', ''),
-        'HOST': 'aws-1-eu-west-1.pooler.supabase.com' if IS_VERCEL else 'db.fvsylxftadodfucftqrc.supabase.co',
-        'PORT': '6543' if IS_VERCEL else '5432',  # 6543 = transaction pooler (serverless), 5432 = direct
+        'HOST': DB_HOST,
+        'PORT': DB_PORT,
         'OPTIONS': {
             'sslmode': 'require',
             'connect_timeout': 10,
